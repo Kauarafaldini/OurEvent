@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ScrollView } from 'react-native-gesture-handler';
 import { StyleSheet, Text, TextInput, KeyboardAvoidingView, TouchableOpacity, Image} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -9,16 +9,16 @@ import * as yup from 'yup'
 
 import * as Animatable from 'react-native-animatable'
 
-
-const schema = yup.object({
-    username: yup.string().required("Insira o Nome de Usuário"),
-    email: yup.string().email("Insira um E-mail valido").required("Insira o E-mail"),
-    senha: yup.string().min(6, "A senha deve conter 6 digitos").required("Insira uma Senha"),
-    cfsenha: yup.string().min(6, "A senha não correspondem").required("Insira uma Senha"),
-    telefone: yup.string().min(11, "Insira um número existente").required("Insira um número de Telefone"),
-})
-
 export default function Cadastro () {
+
+    const schema = yup.object({
+        username: yup.string().required("Insira o Nome de Usuário"),
+        email: yup.string().email("Insira um E-mail valido").required("Insira o E-mail"),
+        senha: yup.string().min(6, "A senha deve conter 6 digitos").required("Insira uma Senha"),
+        cfsenha: yup.string().min(6, "A senha não correspondem").required("Insira uma Senha"),
+        telefone: yup.string().min(11, "Insira um número existente").required("Insira um número de Telefone"),
+    })
+
     const { control, handleSubmit, formState: { errors } } = useForm({
         resolver: yupResolver(schema)
         
@@ -26,9 +26,15 @@ export default function Cadastro () {
 
     const navigation = useNavigation();
 
-    function register(data){
-        console.log(data);
-        navigation.navigate('Home')
+    function register(dados){
+    axios.post('https://localhost/clientes', dados)
+    .then(response => {
+      console.log('Cadastro efetuado: ', response.data);
+      navigation.native('Home');
+    })
+        .catch(error => {
+            console.error('Erro ao enviar o Cadastro:', error);
+        })
     }
 
     return (
@@ -84,22 +90,6 @@ export default function Cadastro () {
             />
             )}/>
             {errors.senha && <Text style={styles.erro}>{errors.senha?.message}</Text>}
-
-            <Text style={styles.text3}>confirmar Senha</Text>
-            <Controller
-            control={control}
-            name="cfsenha"
-            render={({ field: { onChange, onBlur, value}}) => (
-            <TextInput
-                style={styles.input}
-                placeholder='Confirme a senha'
-                value={value}
-                onChangeText={onChange}
-                onBlur={onBlur}
-                secureTextEntry={true}
-            />
-            )}/>
-            {errors.cfsenha && <Text style={styles.erro}>{errors.cfsenha?.message}</Text>}
 
             <Text style={styles.text3}>Telefone</Text>
             <Controller
