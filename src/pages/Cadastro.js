@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ScrollView } from 'react-native-gesture-handler';
-import { StyleSheet, Text, TextInput, KeyboardAvoidingView, TouchableOpacity, Image} from 'react-native';
+import { StyleSheet, Text, TextInput, TouchableOpacity} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 import {useForm, Controller} from 'react-hook-form'
@@ -9,28 +9,72 @@ import * as yup from 'yup'
 
 import * as Animatable from 'react-native-animatable'
 
+import axios from 'axios';
+
 export default function Cadastro () {
+
+    const [cliente, setCliente] = useState({
+        nome:'',
+        email:'',
+        senha:'',
+        cfsenha:'',
+        fone:'',
+    })
+
+    const [mensage,setMensage] = useState("")
+
+    const vlInput = (name, value) => setCliente({ ...cliente, [name]: value });
+
+    const enviarmsg = async (e) => {
+
+        e.preventDefault();
+
+        const headers = {
+            'Content-Type': 'application/json'
+        };
+
+        try {
+            const retorno = await axios.post('http://localhost/8080/clientes', cliente, {headers});
+
+            setMensage(retorno.data.mensage);
+
+            setCliente({
+                nome:'',
+                email:'',
+                senha:'',
+                cfsenha:'',
+                fone:'',
+            })
+        } catch (error) {
+            if (error.response && error.response.data && error.response.data.mensage) {
+              setMensage(error.response.data.mensage);
+            } else {
+              setMensage("Error: Cadastro não efetuado. Por favor, tente novamente.");
+            }
+          }
+        };
 
     const schema = yup.object({
         username: yup.string().required("Insira o Nome de Usuário"),
         email: yup.string().email("Insira um E-mail valido").required("Insira o E-mail"),
         senha: yup.string().min(6, "A senha deve conter 6 digitos").required("Insira uma Senha"),
-        cfsenha: yup.string().min(6, "A senha não correspondem").required("Insira uma Senha"),
+        cfsenha: yup.string().oneOf([yup.ref('senha'), null], 'As senhas não correspondem'),
         telefone: yup.string().min(11, "Insira um número existente").required("Insira um número de Telefone"),
     })
 
     const { control, handleSubmit, formState: { errors } } = useForm({
         resolver: yupResolver(schema)
         
-    })
+    });
 
     const navigation = useNavigation();
 
     function register(dados){
-    axios.post('https://localhost/clientes', dados)
+    axios
+    .post('https://localhost/clientes', dados)
     .then(response => {
       console.log('Cadastro efetuado: ', response.data);
-      navigation.native('Home');
+      navigation.navigate('Home');
     })
         .catch(error => {
             console.error('Erro ao enviar o Cadastro:', error);
@@ -89,7 +133,25 @@ export default function Cadastro () {
                 secureTextEntry={true}
             />
             )}/>
+
             {errors.senha && <Text style={styles.erro}>{errors.senha?.message}</Text>}
+
+            <Text style={styles.text3}>Confirmar senha</Text>
+            <Controller
+            control={control}
+            name='cfsenha'
+            render={({ field: { onChange, onBlur, value}}) => (
+            <TextInput
+                style={styles.input}
+                placeholder="Confirmar senha"
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                secureTextEntry={true}
+            />
+            )}/>
+
+            {errors.cfsenha && <Text style={styles.erro}>{errors.cfsenha?.message}</Text>}
 
             <Text style={styles.text3}>Telefone</Text>
             <Controller
@@ -107,14 +169,16 @@ export default function Cadastro () {
             {errors.telefone && <Text style={styles.erro}>{errors.telefone?.message}</Text>}
 
             <TouchableOpacity 
-                onPress={handleSubmit(register) }
+                onPress={handleSubmit(data => register(data)) }
                 style={styles.botao}>
+
                 <Text style={styles.botaotexto}>Cadastrar</Text>
             </TouchableOpacity>
 
             <TouchableOpacity 
                 style={styles.botao2}
                 onPress={ () => navigation.navigate('Login')}>
+
                 <Text style={styles.botaotexto2}>Voltar</Text>
             </TouchableOpacity>
 
