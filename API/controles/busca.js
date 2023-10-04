@@ -7,12 +7,12 @@ const router = express.Router();
 router.get('/', async (req, res) => {
 
     try{
-        const { nome, email } = req.query;
+        const { username, email } = req.query;
 
         let buscar = {};
 
-        if (nome) {
-            buscar.nome = nome;
+        if (username) {
+            buscar.username = username;
         }
         if (email) {
             buscar.email = email;

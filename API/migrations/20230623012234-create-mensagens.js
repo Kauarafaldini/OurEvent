@@ -9,7 +9,7 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      usuario: {
+      username: {
         type: Sequelize.STRING
       },
       email: {
@@ -18,7 +18,10 @@ module.exports = {
       senha: {
         type: Sequelize.STRING
       },
-      fone: {
+      cfsenha: {
+        type: Sequelize.STRING
+      },
+      telefone: {
         type: Sequelize.STRING
       },
       createdAt: {

@@ -3,22 +3,22 @@ import { ScrollView } from 'react-native-gesture-handler';
 import { StyleSheet, Text, TextInput, TouchableOpacity} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-import {useForm, Controller} from 'react-hook-form'
-import { yupResolver } from '@hookform/resolvers/yup'
-import * as yup from 'yup'
+import { useForm, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
 
-import * as Animatable from 'react-native-animatable'
+import * as Animatable from 'react-native-animatable';
 
 import axios from 'axios';
 
 export default function Cadastro () {
 
     const [cliente, setCliente] = useState({
-        nome:'',
+        username:'',
         email:'',
         senha:'',
         cfsenha:'',
-        fone:'',
+        telefone:'',
     })
 
     const [mensage,setMensage] = useState("")
@@ -34,16 +34,16 @@ export default function Cadastro () {
         };
 
         try {
-            const retorno = await axios.post('http://localhost/8080/clientes', cliente, {headers});
+            const retorno = await axios.post('http://192.168.10.102:1980/clientes', cliente, {headers});
 
             setMensage(retorno.data.mensage);
 
             setCliente({
-                nome:'',
+                username:'',
                 email:'',
                 senha:'',
                 cfsenha:'',
-                fone:'',
+                telefone:'',
             })
         } catch (error) {
             if (error.response && error.response.data && error.response.data.mensage) {
@@ -63,15 +63,14 @@ export default function Cadastro () {
     })
 
     const { control, handleSubmit, formState: { errors } } = useForm({
-        resolver: yupResolver(schema)
-        
+        resolver: yupResolver(schema),
     });
 
     const navigation = useNavigation();
 
     function register(dados){
     axios
-    .post('https://localhost/clientes', dados)
+    .post('http://localhost:1980/clientes', dados)
     .then(response => {
       console.log('Cadastro efetuado: ', response.data);
       navigation.navigate('Home');
