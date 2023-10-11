@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 
 const app = express();
-const port = 1980;
+const port = 8080;
 const ip = "192.168.10.102";
 
 app.use(express.json());

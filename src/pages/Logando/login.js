@@ -23,8 +23,8 @@ export default function Login () {
 
     const navigation = useNavigation(Login)
 
-    function SingIn(dados){
-        console.log(dados);
+    function SingIn(data){
+        console.log(data);
         navigation.navigate('Home')
     }
 

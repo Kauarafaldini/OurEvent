@@ -5,13 +5,13 @@ const router = express.Router();
 router.post("/", async (req, res) => {
     try {
 
-    const dados = req.body;
-    const novoCliente = await db.clientes.create(dados);
+    const data = req.body;
+    const novoCliente = await db.clientes.create(data);
 
         return res.status(200).json({
             error: false,
             mensagem: "Cadastro efetuado com sucesso",
-            dados: novoCliente
+            data: novoCliente
         });
     } catch (error) {
         console.error('Erro interno: ', error);

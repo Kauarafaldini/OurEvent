@@ -12,47 +12,7 @@ import * as Animatable from 'react-native-animatable';
 import axios from 'axios';
 
 export default function Cadastro () {
-
-    const [cliente, setCliente] = useState({
-        username:'',
-        email:'',
-        senha:'',
-        cfsenha:'',
-        telefone:'',
-    })
-
-    const [mensage,setMensage] = useState("")
-
-    const vlInput = (name, value) => setCliente({ ...cliente, [name]: value });
-
-    const enviarmsg = async (e) => {
-
-        e.preventDefault();
-
-        const headers = {
-            'Content-Type': 'application/json'
-        };
-
-        try {
-            const retorno = await axios.post('http://192.168.10.102:1980/clientes', cliente, {headers});
-
-            setMensage(retorno.data.mensage);
-
-            setCliente({
-                username:'',
-                email:'',
-                senha:'',
-                cfsenha:'',
-                telefone:'',
-            })
-        } catch (error) {
-            if (error.response && error.response.data && error.response.data.mensage) {
-              setMensage(error.response.data.mensage);
-            } else {
-              setMensage("Error: Cadastro não efetuado. Por favor, tente novamente.");
-            }
-          }
-        };
+    const [mensagem,setMensagem] = useState("")
 
     const schema = yup.object({
         username: yup.string().required("Insira o Nome de Usuário"),
@@ -60,25 +20,38 @@ export default function Cadastro () {
         senha: yup.string().min(6, "A senha deve conter 6 digitos").required("Insira uma Senha"),
         cfsenha: yup.string().oneOf([yup.ref('senha'), null], 'As senhas não correspondem'),
         telefone: yup.string().min(11, "Insira um número existente").required("Insira um número de Telefone"),
-    })
-
+    });
     const { control, handleSubmit, formState: { errors } } = useForm({
         resolver: yupResolver(schema),
     });
+    const enviarmsg = async (data) => {
+        try {
+            const retorno = await axios.post(`http://192.168.10.102:8080/clientes`, data, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            setMensagem(retorno.data.mensagem);
+
+                data.username ='',
+                data.email ='',
+                data.senha ='',
+                data.cfsenha ='',
+                data.telefone ='',
+
+            navigation.navigate('Home');
+        } catch (error) {
+            if (error.response && error.response.data && error.response.data.mensagem) {
+              setMensagem(error.response.data.mensagem);
+            } else {
+              setMensagem("Erro: Cadastro não efetuado. Por favor, tente novamente.");
+            }
+          }
+        };
+        
 
     const navigation = useNavigation();
-
-    function register(dados){
-    axios
-    .post('http://localhost:1980/clientes', dados)
-    .then(response => {
-      console.log('Cadastro efetuado: ', response.data);
-      navigation.navigate('Home');
-    })
-        .catch(error => {
-            console.error('Erro ao enviar o Cadastro:', error);
-        })
-    }
 
     return (
         <ScrollView style={styles.background}>
@@ -167,8 +140,8 @@ export default function Cadastro () {
             )}/>
             {errors.telefone && <Text style={styles.erro}>{errors.telefone?.message}</Text>}
 
-            <TouchableOpacity 
-                onPress={handleSubmit(data => register(data)) }
+            <TouchableOpacity
+                onPress={handleSubmit(enviarmsg)}
                 style={styles.botao}>
 
                 <Text style={styles.botaotexto}>Cadastrar</Text>

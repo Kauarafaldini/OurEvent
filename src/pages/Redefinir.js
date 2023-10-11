@@ -24,8 +24,8 @@ export default function Redefinir () {
 
 const navigation = useNavigation(Redefinir);
 
-function redefinir(dados){
-    console.log(dados);
+function redefinir(data){
+    console.log(data);
     navigation.navigate('Login')
 }
     return (

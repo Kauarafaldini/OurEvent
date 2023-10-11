@@ -22,7 +22,7 @@ router.get('/', async (req, res) => {
         return res.json({
             error: false,
             mensagem: 'Busca efetuada com sucesso',
-            dados: clientes
+            data: clientes
         });
     } catch (error) {
         return res.status(500).json({
